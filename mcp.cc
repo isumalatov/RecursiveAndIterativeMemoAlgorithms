@@ -52,6 +52,21 @@ int mcp_memo(const vector<vector<int>> &matrix, int posx, int posy, int rows, in
     }
 }
 
+int mcp_it_matix()
+{
+    return -1;
+}
+
+int mcp_it_vector()
+{
+    return -1;
+}
+
+int mcp_parser()
+{
+    return -1;
+}
+
 int main(int argc, char *argv[])
 {
     bool t = false;
@@ -63,7 +78,27 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    ifstream file(argv[2]);
+    ifstream file;
+    for (int i = 0; i < argc; ++i)
+    {
+        if (argv[i] == "-t")
+        {
+            t = true;
+        }
+        else if (argv[i] == "--p2D")
+        {
+            p2D = true;
+        }
+        else if (argv[i] == "--ignore-naive")
+        {
+            ignore_naive = true;
+        }
+        else if (argv[i] == "-f")
+        {
+            ifstream file(argv[i + 1]);
+        }
+    }
+
     if (!file)
     {
         cout << "No se pudo abrir el archivo.\n";
@@ -86,34 +121,35 @@ int main(int argc, char *argv[])
 
     vector<pair<int, int>> path;
 
-    for (int i = 0; i < 6; i++)
-    {
-        if (argv[i] == "-t")
-        {
-            t = true;
-        }
-        else if (argv[i] == "--p2D")
-        {
-            p2D = true;
-        }
-        else if (argv[i] == "--ignore-naive")
-        {
-            ignore_naive = true;
-        }
-    }
-
     if (ignore_naive == true)
     {
         cout << "- ";
-        cout << mcp_memo(matrix, 0, 0, rows, cols, memo, path) << endl;
+        cout << mcp_memo(matrix, 0, 0, rows, cols, memo, path);
     }
     else
     {
         cout << mcp_naive(matrix, 0, 0, rows, cols) << " ";
-        cout << mcp_memo(matrix, 0, 0, rows, cols, memo, path) << endl;
+        cout << mcp_memo(matrix, 0, 0, rows, cols, memo, path);
     }
+
+    if (mcp_it_matix() == -1)
+    {
+        cout << " ? ";
+    }
+
+    if (mcp_it_vector() == -1)
+    {
+        cout << "? ";
+    }
+
+    if (mcp_parser() == -1)
+    {
+        cout << "?";
+    }
+
     if (p2D == true)
     {
+        int coste = 0;
         // Create a character matrix filled with '.'
         vector<vector<char>> charMatrix(rows, vector<char>(cols, '.'));
 
@@ -132,7 +168,25 @@ int main(int argc, char *argv[])
             }
             cout << '\n';
         }
+
+        for (int i = 0; i < rows; ++i)
+        {
+            for (int j = 0; j < cols; ++j)
+            {
+                if (charMatrix[i][j] == '*')
+                {
+                    coste += matrix[i][j];
+                }
+            }
+        }
+        cout << coste << endl;
     }
+
+    if (t == true)
+    {
+        cout << "?";
+    }
+
     file.close();
     return 0;
 }
