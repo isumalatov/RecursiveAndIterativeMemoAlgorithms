@@ -98,14 +98,82 @@ vector<pair<int, int>> reconstruct_path(const vector<vector<int>> &memo, int row
     return path;
 }
 
-int mcp_it_matix()
+int mcp_it_matix(const vector<vector<int>> &matrix, int rows, int cols, vector<vector<int>> &memo)
 {
-    return -1;
+    for (int i = rows - 1; i >= 0; --i)
+    {
+        for (int j = cols - 1; j >= 0; --j)
+        {
+            if (i == rows - 1 && j == cols - 1)
+            {
+                memo[i][j] = matrix[i][j];
+            }
+            else
+            {
+                int solright = INT_MAX;
+                int soldown = INT_MAX;
+                int soldiag = INT_MAX;
+
+                if (j + 1 < cols)
+                {
+                    solright = memo[i][j + 1];
+                }
+                if (i + 1 < rows)
+                {
+                    soldown = memo[i + 1][j];
+                }
+                if (i + 1 < rows && j + 1 < cols)
+                {
+                    soldiag = memo[i + 1][j + 1];
+                }
+
+                memo[i][j] = matrix[i][j] + min(solright, min(soldown, soldiag));
+            }
+        }
+    }
+
+    return memo[0][0];
 }
 
-int mcp_it_vector()
+int mcp_it_vector(const vector<vector<int>> &matrix, int rows, int cols)
 {
-    return -1;
+    vector<int> prev(cols, INT_MAX);
+    vector<int> curr(cols, INT_MAX);
+
+    for (int i = rows - 1; i >= 0; --i)
+    {
+        for (int j = cols - 1; j >= 0; --j)
+        {
+            if (i == rows - 1 && j == cols - 1)
+            {
+                curr[j] = matrix[i][j];
+            }
+            else
+            {
+                int solright = INT_MAX;
+                int soldown = INT_MAX;
+                int soldiag = INT_MAX;
+
+                if (j + 1 < cols)
+                {
+                    solright = curr[j + 1];
+                }
+                if (i + 1 < rows)
+                {
+                    soldown = prev[j];
+                }
+                if (i + 1 < rows && j + 1 < cols)
+                {
+                    soldiag = prev[j + 1];
+                }
+
+                curr[j] = matrix[i][j] + min(solright, min(soldown, soldiag));
+            }
+        }
+        swap(prev, curr);
+    }
+
+    return prev[0];
 }
 
 void mcp_parser(int rows, int cols, const vector<vector<int>> &matrix, const vector<vector<int>> &memo)
@@ -201,26 +269,21 @@ int main(int argc, char *argv[])
     }
 
     vector<vector<int>> memo(rows, vector<int>(cols, -1));
+    vector<vector<int>> memo2(rows, vector<int>(cols, -1));
 
     if (ignore_naive == true)
     {
         cout << "- ";
         cout << mcp_memo(matrix, 0, 0, rows, cols, memo) << " ";
+        cout << mcp_it_matix(matrix, rows, cols, memo2) << " ";
+        cout << mcp_it_vector(matrix, rows, cols) << endl;
     }
     else
     {
         cout << mcp_naive(matrix, 0, 0, rows, cols) << " ";
         cout << mcp_memo(matrix, 0, 0, rows, cols, memo) << " ";
-    }
-
-    if (mcp_it_matix() == -1)
-    {
-        cout << "? ";
-    }
-
-    if (mcp_it_vector() == -1)
-    {
-        cout << "?\n";
+        cout << mcp_it_matix(matrix, rows, cols, memo2) << " ";
+        cout << mcp_it_vector(matrix, rows, cols) << endl;
     }
 
     if (p2D == true)
@@ -230,7 +293,14 @@ int main(int argc, char *argv[])
 
     if (t == true)
     {
-        cout << "?" << endl;
+        for (int i = 0; i < rows; ++i)
+        {
+            for (int j = 0; j < cols; ++j)
+            {
+                cout << memo2[i][j] << " ";
+            }
+            cout << endl;
+        }
     }
 
     file.close();

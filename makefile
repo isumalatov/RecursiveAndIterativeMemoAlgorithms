@@ -9,5 +9,5 @@ tar:
 	tar -cvzf X727815E.tar.gz mcp.cc makefile
 
 clean:
-	rm -f mcp X727815E.tar.gz
+	rm -f mcp X727815E.tar.gz mcp
 
